@@ -1,26 +1,8 @@
-import client from "prom-client";
+import { Counter } from "prom-client";
 
-
-export const httpRequestDurationMicroseconds = new client.Histogram({
-    name: "http_request_duration_ms",
-    help: "Duration of HTTP request in ms",
-    labelNames:["method","route","code"],
-    buckets: [0.1, 5, 15, 50, 100, 300, 500, 1000, 3000, 5000]
+export const counter = new Counter({
+    name: "HTTP_number_of_request", // here we need to mention name and help as a discription
+    help: "Number of HTTP request",
+    labelNames: ["method", "route", "status_code"]  // info lables 
 })
 
-
-//@ts-ignore
-export function requestCount(req, res, next) {
-    const startTime = Date.now();
-
-    res.on("finish", () => {
-        const endTime = Date.now();
-        httpRequestDurationMicroseconds.observe({
-            method: req.method,
-            route: req.route ? req.route.path : req.path,
-            code: res.statusCode
-        }, endTime - startTime)
-    });
-
-    next();
-}
